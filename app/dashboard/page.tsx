@@ -1,18 +1,17 @@
-import { ChartAreaInteractive } from "@//components/chart-area-interactive"
-import { DataTable } from "@//components/data-table"
-import { SectionCards } from "@//components/section-cards"
-import data from "@/app/dashboard/data.json"
+import { ReservationsList } from "@/components/reservations-list";
 
 export default function Page() {
   return (
-    <div className="@container/main flex flex-1 flex-col gap-2">
-      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <SectionCards />
-        <div className="px-4 lg:px-6">
-          <ChartAreaInteractive />
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">My Reservations</h1>
+          <p className="text-muted-foreground">
+            View and manage your upcoming and past reservations
+          </p>
         </div>
-        <DataTable data={data} />
+        <ReservationsList />
       </div>
     </div>
-  )
+  );
 }

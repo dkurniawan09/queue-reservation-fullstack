@@ -40,10 +40,20 @@ export default function Home() {
           </h1>
         </div>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto px-4 mb-8">
-          A modern full-stack TypeScript starter with authentication, database, and UI components
+          Queue Management & Online Reservation System - Book appointments, manage queues, and streamline customer service
         </p>
         
         <HeroAuthButtons />
+
+        {/* Queue Management CTA */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" asChild>
+            <a href="/reserve">Book Appointment</a>
+          </Button>
+          <Button variant="outline" size="lg" asChild>
+            <a href="/admin/queue">Admin Dashboard</a>
+          </Button>
+        </div>
       </div>
 
       <main className="container mx-auto px-4 sm:px-6 pb-12 sm:pb-8 max-w-5xl">

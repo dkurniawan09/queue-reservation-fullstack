@@ -1,90 +1,147 @@
-# Tech Stack Document
+# Tech Stack Document for queue-reservation-fullstack
 
-This document explains the key technologies chosen for the **codeguide-starter** project. It’s written in everyday language so anyone—technical or not—can understand why each tool was picked and how it supports the application.
+This document explains, in everyday language, the technology choices behind the **queue-reservation-fullstack** starter template. It shows how each tool fits together to build a modern queue management and online reservation system.
+
+---
 
 ## 1. Frontend Technologies
-The frontend is everything the user sees and interacts with. For this project, we’ve used:
+
+Our user interface is built with modern, type-safe, and highly customizable tools to ensure a great experience for both customers and administrators.
 
 - **Next.js (App Router)**
-  - A React framework that makes page routing, server-side rendering, and API routes very simple.
-  - Enhances user experience by pre-rendering pages on the server or at build time, leading to faster initial load.
-- **React 18**
-  - The underlying library for building user interfaces with reusable components.
-  - Provides a smooth, interactive experience thanks to its virtual DOM and modern hooks.
-- **TypeScript**
-  - A superset of JavaScript that adds types (labels for data).
-  - Helps catch errors early during development and makes the code easier to maintain.
-- **CSS (globals.css & theme.css)**
-  - **globals.css** applies base styles (fonts, colors, resets) across the entire app.
-  - **dashboard/theme.css** defines the look and feel specific to the dashboard area.
-  - This separation keeps styles organized and avoids accidental style conflicts.
+  - Provides page and layout organization through the new `app/` directory.
+  - Enables server-side rendering, client-side navigation, and easy route protection for public and admin pages.
 
-By combining these tools, we have a clear structure (Next.js folders for pages and layouts), safer code (TypeScript), and flexible styling with vanilla CSS.
+- **TypeScript**
+  - Catches errors early by enforcing types across both frontend and backend code.
+  - Makes it easier to handle reservation data (dates, user IDs, queue positions) without accidental mistakes.
+
+- **shadcn/ui**
+  - A library of pre-built, accessible React components such as calendars, tables, forms, and dialogs.
+  - Lets us quickly assemble booking forms and dashboards that look polished and work well on all devices.
+
+- **Tailwind CSS**
+  - A utility-first styling framework that speeds up custom design without writing lots of custom CSS.
+  - Ensures responsive layouts for mobile, tablet, and desktop views of the reservation interface.
+
+- **next-themes**
+  - Manages light and dark mode automatically, storing user preference in local storage.
+  - Lets us deliver a premium, theme-switching experience out of the box.
+
+- **State Management & Data Fetching**
+  - **SWR** or **React Query** (choose one):
+    - Handles fetching and caching reservation and queue data from API routes.
+    - Supports polling or background refresh to keep queue status up to date in real time.
+
+- **Code Quality Tools**
+  - **ESLint** and **Prettier** enforce consistent code style and help avoid common JavaScript/TypeScript mistakes.
+
+---
 
 ## 2. Backend Technologies
-The backend handles data, user accounts, and the logic behind the scenes. Our choices here are:
+
+The server side uses the same Next.js project for API endpoints, plus secure authentication and a reliable database setup.
 
 - **Next.js API Routes**
-  - Allows us to write server-side code (`route.ts` files) alongside our frontend in the same project.
-  - Runs on Node.js, so we can handle requests like sign-up, sign-in, and data fetching in one place.
-- **Node.js Runtime**
-  - The JavaScript environment on the server that executes our API routes.
-- **bcrypt** (npm package)
-  - A library for hashing passwords securely before storing them.
-  - Ensures that even if someone got access to our data, raw passwords aren’t visible.
-- **(Optional) NextAuth.js or JWT**
-  - While this starter kit shows a custom authentication flow, it can easily integrate services like NextAuth.js for email-based login or JWT (JSON Web Tokens) for stateless sessions.
+  - Folder-based endpoints under `app/api/` that handle all reservation and queue logic.
+  - Let us write familiar JavaScript/TypeScript functions for creating, reading, and updating data.
 
-These components work together to receive user credentials, verify or store them securely, manage sessions or tokens, and deliver protected data back to the frontend.
+- **Better Auth**
+  - A built-in email/password authentication library that handles registration, login, password resets, and session management.
+  - Secures both public and admin routes with role-based access control.
+
+- **PostgreSQL**
+  - A powerful, open-source relational database that stores users, services, reservations, and queue entries.
+  - Excellent for modeling relationships and running complex queries (e.g., finding available time slots).
+
+- **Drizzle ORM**
+  - A type-safe query builder that integrates with PostgreSQL.
+  - Ensures that all database reads and writes follow the schema definitions, reducing runtime errors.
+
+- **Zod**
+  - A schema validation library for TypeScript.
+  - Validates incoming data on API routes (for example, reservation dates and user inputs) to prevent invalid or malicious requests.
+
+- **(Optional) Real-Time Layer**
+  - For instant queue updates, you can add a WebSocket solution (e.g., Socket.io, Pusher) alongside API Routes.
+
+---
 
 ## 3. Infrastructure and Deployment
-Infrastructure covers where and how we host the app, as well as how changes get delivered:
+
+We’ve chosen tools that streamline development, testing, and deployment, ensuring consistency across environments.
+
+- **Docker**
+  - Encapsulates the entire application (frontend, backend, database) into containers.
+  - Guarantees that "it works on my machine" matches your production server.
 
 - **Git & GitHub**
-  - Version control system (Git) and remote hosting (GitHub) keep track of all code changes and allow team collaboration.
-- **Vercel (or Netlify)**
-  - A popular hosting service optimized for Next.js, with one-click deployments and global content delivery.
-  - Automatically rebuilds and deploys the site whenever code is pushed to the main branch.
-- **GitHub Actions (CI/CD)**
-  - Automates tasks like linting (ESLint), formatting (Prettier), and running any tests you add.
-  - Ensures that only clean, tested code goes live.
+  - Version control with feature branches, pull requests, and code reviews.
+  - Keeps a clear history of changes and makes collaboration smooth.
 
-Together, these tools provide a reliable, scalable setup where every code change is tested and deployed quickly, with minimal manual work.
+- **CI/CD Pipeline**
+  - **GitHub Actions** (or your preferred CI tool) can run tests, lint checks, and build steps on every push.
+  - Automatically deploys to the hosting platform when changes are merged into the main branch.
+
+- **Hosting**
+  - **Vercel** (recommended) for Next.js apps: zero-config deployments, built-in preview URLs, and global edge network.
+  - Environment variables (for database URLs, auth secrets, API keys) are managed securely in the hosting dashboard.
+
+---
 
 ## 4. Third-Party Integrations
-While this starter kit is minimal by design, it already includes or can easily add:
 
-- **bcrypt**
-  - For secure password hashing (included as an npm dependency).
-- **NextAuth.js** (optional)
-  - A full-featured authentication library supporting email/password, OAuth, and more.
-- **Sentry or LogRocket** (optional)
-  - For real-time error tracking and performance monitoring in production.
+These services plug in seamlessly to add extra functionality without reinventing the wheel.
 
-These integrations help extend the app’s capabilities without building every feature from scratch.
+- **Email Service** (e.g., SendGrid or Nodemailer)
+  - Sends confirmation emails after a reservation is booked or canceled.
+  - Keeps users informed and reduces no-shows.
+
+- **Analytics** (e.g., Google Analytics or Vercel Analytics)
+  - Tracks page views, sign-ups, and reservation completions.
+  - Provides insights into user behavior and system usage patterns.
+
+- **Monitoring & Error Tracking** (e.g., Sentry)
+  - Collects runtime errors and performance metrics from both client and server.
+  - Alerts you when something goes wrong in production.
+
+---
 
 ## 5. Security and Performance Considerations
-We’ve baked in several measures to keep users safe and the app running smoothly:
 
-Security:
-- Passwords are never stored in plain text—bcrypt hashes them with a random salt.
-- API routes can implement CSRF protection and input validation to block malicious requests.
-- Session tokens or cookies are marked secure and HttpOnly to prevent theft via JavaScript.
+We’ve built security and speed into the stack from day one.
 
-Performance:
-- Server-side rendering (SSR) and static site generation (SSG) in Next.js deliver pages faster.
-- Code splitting and lazy-loaded components ensure users only download what they need.
-- Global CSS and theme files are small and cached by the browser for quick repeat visits.
+- **Authentication & Authorization**
+  - All API routes are protected by the Better Auth middleware.
+  - Admin-only routes require an admin role on the user session.
 
-These strategies work together to give users a fast, secure experience every time.
+- **Data Validation**
+  - Zod checks all incoming data to prevent SQL injection and malformed requests.
+
+- **Environment Variables**
+  - Secrets (database credentials, auth tokens, third-party keys) are never hard-coded.
+  - Stored securely in `.env` files locally and in the hosting provider’s settings.
+
+- **Rate Limiting & Throttling** (optional)
+  - You can add middleware to limit how often a user can hit an endpoint (to guard against abuse).
+
+- **Performance Optimizations**
+  - Next.js code-splitting and prefetching reduce initial load times.
+  - Tailwind CSS purges unused styles for a smaller CSS bundle.
+  - SWR/React Query caches data and minimizes redundant network requests.
+  - Docker images are slimmed down by using multi-stage builds.
+
+---
 
 ## 6. Conclusion and Overall Tech Stack Summary
-In building **codeguide-starter**, we chose technologies that:
 
-- Align with modern web standards (Next.js, React, TypeScript).
-- Provide a clear, file-based project structure for rapid onboarding.
-- Offer built-in support for server-side rendering, API routes, and static assets.
-- Emphasize security through password hashing, session management, and safe defaults.
-- Enable easy scaling and future enhancements via modular code and optional integrations.
+This starter template uses a **modern, unified JavaScript/TypeScript** approach across frontend and backend, centered on Next.js. It combines best-in-class tools for UI design, data management, security, and deployment:
 
-This stack strikes a balance between simplicity for newcomers and flexibility for experienced teams. It accelerates development of a secure authentication flow and a polished dashboard, while leaving room to plug in databases, test suites, and advanced features as the project grows.
+- **Frontend**: Next.js, TypeScript, shadcn/ui, Tailwind CSS, next-themes, SWR/React Query, ESLint, Prettier.
+- **Backend**: Next.js API Routes, Better Auth, PostgreSQL, Drizzle ORM, Zod.
+- **Infrastructure**: Docker, Git/GitHub, GitHub Actions, Vercel.
+- **Integrations**: Email service, analytics, error monitoring.
+
+Together, these technologies make it easy to build a reliable, secure, and scalable queue management system with online reservation capabilities. You can focus on your unique business logic—like custom booking rules or queue-advancement policies—while relying on this stack for all the common, complex features.
+
+Happy coding!
