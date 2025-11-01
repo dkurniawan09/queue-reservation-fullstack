@@ -1,117 +1,117 @@
-# Project Requirements Document: codeguide-starter
-
----
+# Project Requirements Document (PRD)
 
 ## 1. Project Overview
 
-The **codeguide-starter** project is a boilerplate web application that provides a ready-made foundation for any web project requiring secure user authentication and a post-login dashboard. It sets up the common building blocks—sign-up and sign-in pages, API routes to handle registration and login, and a simple dashboard interface driven by static data. By delivering this skeleton, it accelerates development time and ensures best practices are in place from day one.
+This project is a full-stack web application template for a queue management and online reservation system. It provides everything you need to let customers sign up, book time slots for services, and view or cancel their reservations. On the flip side, administrators get a secure dashboard where they can see the current queue, advance to the next customer, or manage bookings in real time.
 
-This starter kit is being built to solve the friction developers face when setting up repeated common tasks: credential handling, session management, page routing, and theming. Key objectives include: 1) delivering a fully working authentication flow (registration & login), 2) providing a gated dashboard area upon successful login, 3) establishing a clear, maintainable project structure using Next.js and TypeScript, and 4) demonstrating a clean theming approach with global and section-specific CSS. Success is measured by having an end-to-end login journey in under 200 lines of code and zero runtime type errors.
+We’re building it because many small businesses—salons, clinics, repair shops—need a simple way to move their in-person queues online. Key objectives include:
 
----
+•  Allowing users to register, log in, and reserve available slots via an intuitive form.  
+•  Giving admins a protected dashboard to monitor and control the queue.  
+•  Ensuring the system is secure, scalable, and easy to deploy through Docker and Vercel.  
+
+Success looks like stable bookings (no double-bookings), sub-second page loads, a user-friendly UI with dark mode, and straightforward deployment to production.
 
 ## 2. In-Scope vs. Out-of-Scope
 
-### In-Scope (Version 1)
-- User registration (sign-up) form with validation
-- User login (sign-in) form with validation
-- Next.js API routes under `/api/auth/route.ts` handling:
-  - Credential validation
-  - Password hashing (e.g., bcrypt)
-  - Session creation or JWT issuance
-- Protected dashboard pages under `/dashboard`:
-  - `layout.tsx` wrapping dashboard content
-  - `page.tsx` rendering static data from `data.json`
-- Global application layout in `/app/layout.tsx`
-- Basic styling via `globals.css` and `dashboard/theme.css`
-- TypeScript strict mode enabled
+**In-Scope (First Release)**
+- Email/password authentication (Better Auth library) with session handling.  
+- PostgreSQL database schema for users, services, reservations, and queue entries (via Drizzle ORM).  
+- Reservation UI: selection of service, date, and time slot on `/reserve`.  
+- User dashboard at `/dashboard` to view, cancel, or modify their reservations.  
+- Admin dashboard under `/admin/queue` with queue table, “Next Customer” and “Cancel” controls.  
+- Basic input validation (Zod) on all API routes.  
+- Responsive, accessible UI built with shadcn/ui and Tailwind CSS.  
+- Dark mode support (next-themes).  
+- Containerization with Docker and deployment setup for Vercel.  
 
-### Out-of-Scope (Later Phases)
-- Integration with a real database (PostgreSQL, MongoDB, etc.)
-- Advanced authentication flows (password reset, email verification, MFA)
-- Role-based access control (RBAC)
-- Multi-tenant or white-label theming
-- Unit, integration, or end-to-end testing suites
-- CI/CD pipeline and production deployment scripts
-
----
+**Out-of-Scope (Phase 2+)**
+- Payment gateway integration (Stripe, PayPal).  
+- SMS or email notifications for reminders or confirmations.  
+- WebSocket real-time updates (only polling with React Query/SWR initially).  
+- Multi-language (i18n) support.  
+- Detailed analytics or reporting dashboards.  
+- Mobile-only native apps (React Native or SwiftUI).  
 
 ## 3. User Flow
 
-A new visitor lands on the root URL and sees a welcome page with options to **Sign Up** or **Sign In**. If they choose Sign Up, they fill in their email, password, and hit “Create Account.” The form submits to `/api/auth/route.ts`, which hashes the password, creates a new user session or token, and redirects them to the dashboard. If any input is invalid, an inline error message explains the issue (e.g., “Password too short”).
+A new visitor lands on the home page and clicks “Sign Up.” They register with email and password, then are redirected to `/reserve`. Here they select a service type, pick an available date on a calendar component, choose a time slot from a dropdown, and hit “Book Now.” Behind the scenes, the form calls `POST /api/reservations`. The server checks the session, validates inputs with Zod, writes a new record via Drizzle ORM, and returns success or an error (e.g., if the slot is taken). The user sees a confirmation toast and can click “My Reservations.”
 
-Once authenticated, the user is taken to the `/dashboard` route. Here they see a sidebar or header defined by `dashboard/layout.tsx`, and the main panel pulls in static data from `data.json`. They can log out (if that control is present), but otherwise their entire session is managed by server-side cookies or tokens. Returning users go directly to Sign In, submit credentials, and upon success they land back on `/dashboard`. Any unauthorized access to `/dashboard` redirects back to Sign In.
-
----
+Authenticated users visit `/dashboard` to see a clean table of upcoming and past bookings. They can cancel or modify reservations. Administrators sign in with a special role and land on `/admin/queue`. A sidebar shows navigation links; the main area displays a live queue table. Admins click “Next Customer” to advance the queue (via `POST /api/queues/[id]/advance`) or “Cancel” to remove a booking. All operations happen seamlessly, with data fetched using React Query or SWR for polling every 10–30 seconds.
 
 ## 4. Core Features
 
-- **Sign-Up Page (`/app/sign-up/page.tsx`)**: Form fields for email & password, client-side validation, POST to `/api/auth`.
-- **Sign-In Page (`/app/sign-in/page.tsx`)**: Form fields for email & password, client-side validation, POST to `/api/auth`.
-- **Authentication API (`/app/api/auth/route.ts`)**: Handles both registration and login based on HTTP method, integrates password hashing (bcrypt) and session or JWT logic.
-- **Global Layout (`/app/layout.tsx` + `globals.css`)**: Shared header, footer, and CSS resets across all pages.
-- **Dashboard Layout (`/app/dashboard/layout.tsx` + `dashboard/theme.css`)**: Sidebar or top nav for authenticated flows, section-specific styling.
-- **Dashboard Page (`/app/dashboard/page.tsx`)**: Reads `data.json`, renders it as cards or tables.
-- **Static Data Source (`/app/dashboard/data.json`)**: Example dataset to demo dynamic rendering.
-- **TypeScript Configuration**: `tsconfig.json` with strict mode and path aliases (if any).
-
----
+- **Authentication & Authorization**: Email/password sign up, login, logout, session management, and role-based access (user vs. admin).
+- **Reservation Form & API**: User-facing booking form with service selector, calendar, time picker; server endpoints to create and fetch reservations.
+- **User Dashboard**: Table of personal reservations with cancel or reschedule options.
+- **Admin Queue Dashboard**: Live queue table showing next customers, with actions to advance or cancel.
+- **Data Modeling**: Drizzle ORM schemas for users, services, reservations, and queue entries; migrations to create tables and indexes.
+- **UI Components**: shadcn/ui primitives (Input, Select, Calendar, Table, Button, Dialog) customized via Tailwind CSS.
+- **Theming**: Light/dark mode support with next-themes.
+- **Validation & Error Handling**: Zod schemas for all inputs; user-friendly error messages and server-side logging.
+- **State Management & Data Fetching**: React Query or SWR for caching, polling, and revalidation of reservation and queue data.
+- **Deployment & Dev Workflow**: Docker setup for consistent environments; Vercel configuration for CI/CD.
 
 ## 5. Tech Stack & Tools
 
-- **Framework**: Next.js (App Router) for file-based routing, SSR/SSG, and API routes.
-- **Language**: TypeScript for type safety.
-- **UI Library**: React 18 for component-based UI.
-- **Styling**: Plain CSS via `globals.css` (global reset) and `theme.css` (sectional styling). Can easily migrate to CSS Modules or Tailwind in the future.
-- **Backend**: Node.js runtime provided by Next.js API routes.
-- **Password Hashing**: bcrypt (npm package).
-- **Session/JWT**: NextAuth.js or custom JWT logic (to be decided in implementation).
-- **IDE & Dev Tools**: VS Code with ESLint, Prettier extensions. Optionally, Cursor.ai for AI-assisted coding.
-
----
+- **Frontend**: Next.js (App Router), React, TypeScript, Tailwind CSS, shadcn/ui, next-themes  
+- **Backend**: Next.js API Routes (Node.js), TypeScript, Better Auth library  
+- **Database**: PostgreSQL, Drizzle ORM  
+- **Validation**: Zod (runtime input validation)  
+- **State/Data Fetching**: React Query or SWR for client-side caching and polling  
+- **Containerization**: Docker, Docker Compose  
+- **Deployment**: Vercel (Git-based CI/CD pipeline)  
+- **Code Quality**: ESLint, Prettier  
+- **Utilities**: GitHub Actions for tests, Node.js LTS, environment variables via `.env`  
+- **IDE/Plugins (optional)**: VS Code with Windsurf (dev environment scaffolding), Cursor AI for code suggestions
 
 ## 6. Non-Functional Requirements
 
-- **Performance**: Initial page load under 200 ms on a standard broadband connection. API responses under 300 ms.
-- **Security**:
-  - HTTPS only in production.
-  - Proper CORS, CSRF protection for API routes.
-  - Secure password storage (bcrypt with salt).
-  - No credentials or secrets checked into version control.
-- **Scalability**: Structure must support adding database integration, caching layers, and advanced auth flows without rewiring core app.
-- **Usability**: Forms should give real-time feedback on invalid input. Layout must be responsive (mobile > 320 px).
-- **Maintainability**: Code must adhere to TypeScript strict mode. Linting & formatting enforced by ESLint/Prettier.
-
----
+- **Performance**:  
+  • API response times under 200 ms.  
+  • Page loads under 1 second on 3G/LTE.  
+- **Scalability**:  
+  • Support up to 1,000 concurrent users with horizontal scaling.  
+- **Security**:  
+  • All traffic over HTTPS.  
+  • OWASP Top 10 mitigation.  
+  • Secure JWT/session storage.  
+  • Environment variables for secrets.  
+- **Usability & Accessibility**:  
+  • WCAG 2.1 AA compliance for forms and tables.  
+  • Responsive design for desktop and mobile.  
+- **Reliability & Monitoring**:  
+  • Centralized logging of errors and user actions.  
+  • Health checks for the API.  
+- **Compliance**:  
+  • GDPR-ready user data handling.  
+  • Database encrypted at rest if required by host.
 
 ## 7. Constraints & Assumptions
 
-- **No Database**: Dashboard uses only `data.json`; real database integration is deferred.
-- **Node Version**: Requires Node.js >= 14.
-- **Next.js Version**: Built on Next.js 13+ App Router.
-- **Authentication**: Assumes availability of bcrypt or NextAuth.js at implementation time.
-- **Hosting**: Targets serverless or Node.js-capable hosting (e.g., Vercel, Netlify).
-- **Browser Support**: Modern evergreen browsers; no IE11 support required.
-
----
+- PostgreSQL is available and reachable from containerized services.  
+- Docker and Docker Compose are used in dev and staging; Vercel handles production builds.  
+- Better Auth library supports all required auth flows.  
+- Node.js LTS (18+) runtime in production.  
+- No SMS gateway or third-party notifications initially.  
+- Users have modern browsers that support ES modules and CSS variables.  
+- Service timeslots are defined in the database; business rules for slot length live in code.
 
 ## 8. Known Issues & Potential Pitfalls
 
-- **Static Data Limitation**: `data.json` is only for demo. A real API or database will be needed to avoid stale data.
-  *Mitigation*: Define a clear interface for data fetching so swapping to a live endpoint is trivial.
-
-- **Global CSS Conflicts**: Using global styles can lead to unintended overrides.
-  *Mitigation*: Plan to migrate to CSS Modules or utility-first CSS in Phase 2.
-
-- **API Route Ambiguity**: Single `/api/auth/route.ts` handling both sign-up and sign-in could get complex.
-  *Mitigation*: Clearly branch on HTTP method (`POST /register` vs. `POST /login`) or split into separate files.
-
-- **Lack of Testing**: No test suite means regressions can slip in.
-  *Mitigation*: Build a minimal Jest + React Testing Library setup in an early iteration.
-
-- **Error Handling Gaps**: Client and server must handle edge cases (network failures, malformed input).
-  *Mitigation*: Define a standard error response schema and show user-friendly messages.
+- **Double-Booking/Race Conditions**: Two users may try to book the same slot at once.  
+  • Mitigation: Use database-level unique constraints on `(service_id, datetime)`, wrap creation in transactions, check availability again before commit.
+- **Polling Overhead**: Frequent polling can tax the server and client.  
+  • Mitigation: Start with 15–30 sec polling; later upgrade to WebSockets if needed.
+- **Theme FOUC (Flash of Unstyled Content)**: Dark/light mode switch can cause a flicker on load.  
+  • Mitigation: Follow next-themes best practices with `next/script` to set the initial theme.
+- **Database Migrations Drift**: Schema changes may get out of sync.  
+  • Mitigation: Adopt a migration tool (e.g., Drizzle’s migration CLI) and enforce migrations in CI.
+- **Error Transparency**: Users need clear feedback on booking failures.  
+  • Mitigation: Standardize API error format, show toast or inline messages for validation issues.
+- **Container Networking**: Misconfigured Docker ports can block the database connection.  
+  • Mitigation: Document all required ports and environment variables in `docker-compose.yml`.
 
 ---
 
-This PRD should serve as the single source of truth for the AI model or any developer generating the next set of technical documents: Tech Stack Doc, Frontend Guidelines, Backend Structure, App Flow, File Structure, and IDE Rules. It contains all functional and non-functional requirements with no ambiguity, enabling seamless downstream development.
+**This PRD is the single source of truth for the AI model to generate subsequent Technical Stack, Frontend Guidelines, Backend Structure, App Flow, and File Structure documents.** All details are spelled out—there’s no guesswork left.
